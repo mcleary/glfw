@@ -63,6 +63,7 @@
 
 #include <windows.h>
 #include <mmsystem.h>
+#include <xinput.h>
 #include <dbt.h>
 
 #if defined(_MSC_VER)
@@ -115,14 +116,16 @@ typedef enum PROCESS_DPI_AWARENESS
 #endif /*DPI_ENUMS_DECLARED*/
 
 // winmm.dll function pointer typedefs
-typedef MMRESULT (WINAPI * JOYGETDEVCAPS_T)(UINT,LPJOYCAPS,UINT);
-typedef MMRESULT (WINAPI * JOYGETPOS_T)(UINT,LPJOYINFO);
-typedef MMRESULT (WINAPI * JOYGETPOSEX_T)(UINT,LPJOYINFOEX);
 typedef DWORD (WINAPI * TIMEGETTIME_T)(void);
-#define _glfw_joyGetDevCaps _glfw.win32.winmm.joyGetDevCaps
-#define _glfw_joyGetPos _glfw.win32.winmm.joyGetPos
-#define _glfw_joyGetPosEx _glfw.win32.winmm.joyGetPosEx
 #define _glfw_timeGetTime _glfw.win32.winmm.timeGetTime
+
+// xinput.dll function pointer typedefs
+typedef DWORD (WINAPI * XINPUTGETCAPABILITIES_T)(DWORD,DWORD,XINPUT_CAPABILITIES*);
+typedef DWORD (WINAPI * XINPUTGETSTATE_T)(DWORD,XINPUT_STATE*);
+typedef void (WINAPI * XINPUTENABLE_T)(BOOL);
+#define _glfw_XInputGetCapabilities _glfw.win32.xinput.XInputGetCapabilities
+#define _glfw_XInputGetState _glfw.win32.xinput.XInputGetState
+#define _glfw_XInputEnable _glfw.win32.xinput.XInputEnable
 
 // user32.dll function pointer typedefs
 typedef BOOL (WINAPI * SETPROCESSDPIAWARE_T)(void);
@@ -195,16 +198,20 @@ typedef struct _GLFWlibraryWin32
     // winmm.dll
     struct {
         HINSTANCE       instance;
-        JOYGETDEVCAPS_T joyGetDevCaps;
-        JOYGETPOS_T     joyGetPos;
-        JOYGETPOSEX_T   joyGetPosEx;
         TIMEGETTIME_T   timeGetTime;
     } winmm;
 
     // user32.dll
     struct {
-        HINSTANCE       instance;
-        SETPROCESSDPIAWARE_T SetProcessDPIAware;
+        HINSTANCE               instance;
+        XINPUTGETCAPABILITIES_T XInputGetCapabilities;
+        XINPUTGETSTATE_T        XInputGetState;
+        XINPUTENABLE_T          XInputEnable;
+    } xinput;
+
+    struct {
+        HINSTANCE                     instance;
+        SETPROCESSDPIAWARE_T          SetProcessDPIAware;
         CHANGEWINDOWMESSAGEFILTEREX_T ChangeWindowMessageFilterEx;
     } user32;
 

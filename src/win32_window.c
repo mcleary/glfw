@@ -271,6 +271,15 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
                     _glfwInputMonitorChange();
                     return TRUE;
                 }
+                else if (wParam == DBT_DEVICEARRIVAL)
+                {
+                    DEV_BROADCAST_HDR* dbh = (DEV_BROADCAST_HDR*) lParam;
+                    if (dbh)
+                    {
+                        if (dbh->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
+                            _glfwDetectJoysticksWin32();
+                    }
+                }
 
                 break;
             }
@@ -641,6 +650,14 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 
             DragFinish(drop);
             return 0;
+        }
+
+        case WM_ACTIVATEAPP:
+        {
+            if (_glfw_XInputEnable)
+                _glfw_XInputEnable(wParam);
+
+            break;
         }
     }
 

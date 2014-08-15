@@ -30,18 +30,27 @@
 #define _GLFW_PLATFORM_LIBRARY_JOYSTICK_STATE \
     _GLFWjoystickWin32 win32_js[GLFW_JOYSTICK_LAST + 1]
 
+// HACK: Define macros that some older xinput.h variants don't
+#ifndef XINPUT_CAPS_WIRELESS
+ #define XINPUT_CAPS_WIRELESS 0x0002
+#endif
 
 // Win32-specific per-joystick data
 //
 typedef struct _GLFWjoystickWin32
 {
+    GLFWbool        present;
     float           axes[6];
-    unsigned char   buttons[36]; // 32 buttons plus one hat
+    int             axisCount;
+    unsigned char   buttons[14];
+    int             buttonCount;
     char*           name;
+    DWORD           index;
 } _GLFWjoystickWin32;
 
 
 void _glfwInitJoysticksWin32(void);
 void _glfwTerminateJoysticksWin32(void);
+void _glfwDetectJoysticksWin32(void);
 
 #endif // _glfw3_win32_joystick_h_
