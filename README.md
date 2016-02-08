@@ -52,8 +52,8 @@ GLFW itself needs only the headers and libraries for your window system.  It
 does not need the headers for any context creation API (WGL, GLX, EGL, NSGL) or
 client API (OpenGL, OpenGL ES) to enable support for them.
 
-GLFW bundles a number of dependencies in the `deps/` directory.  These are only
-used by the tests and examples and are not required to build the library.
+The bundled example and test programs depend on a number of tiny libraries.
+These are located in the `deps/` directory.
 
  - [getopt\_port](https://github.com/kimgr/getopt_port/) for examples
    with command-line options
@@ -63,6 +63,12 @@ used by the tests and examples and are not required to build the library.
    [glad](https://github.com/Dav1dde/glad) for examples using modern OpenGL
  - [linmath.h](https://github.com/datenwolf/linmath.h) for linear algebra in
    examples
+
+The building of examples, test programs and documentation can be disabled with
+[CMake options](http://www.glfw.org/docs/latest/compile.html).
+
+The documentation is generated with [Doxygen](http://doxygen.org/).  If CMake
+does not find Doxygen, the documentation will not be generated.
 
 
 ## Changelog
