@@ -194,6 +194,9 @@ int main(void)
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        // Workaround for an issue with msvcrt and mintty
+        fflush(stdout);
     }
 
     glfwTerminate();
