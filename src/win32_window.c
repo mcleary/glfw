@@ -655,7 +655,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
         case WM_ACTIVATEAPP:
         {
             if (_glfw_XInputEnable)
-                _glfw_XInputEnable(wParam);
+                _glfw_XInputEnable((BOOL) wParam);
 
             break;
         }
