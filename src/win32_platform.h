@@ -115,6 +115,32 @@ typedef enum PROCESS_DPI_AWARENESS
 } PROCESS_DPI_AWARENESS;
 #endif /*DPI_ENUMS_DECLARED*/
 
+// HACK: Define macros that some older xinput.h variants don't
+#ifndef XINPUT_CAPS_WIRELESS
+ #define XINPUT_CAPS_WIRELESS 0x0002
+#endif
+#ifndef XINPUT_DEVSUBTYPE_WHEEL
+ #define XINPUT_DEVSUBTYPE_WHEEL 0x02
+#endif
+#ifndef XINPUT_DEVSUBTYPE_ARCADE_STICK
+ #define XINPUT_DEVSUBTYPE_ARCADE_STICK 0x03
+#endif
+#ifndef XINPUT_DEVSUBTYPE_FLIGHT_STICK
+ #define XINPUT_DEVSUBTYPE_FLIGHT_STICK 0x04
+#endif
+#ifndef XINPUT_DEVSUBTYPE_DANCE_PAD
+ #define XINPUT_DEVSUBTYPE_DANCE_PAD 0x05
+#endif
+#ifndef XINPUT_DEVSUBTYPE_GUITAR
+ #define XINPUT_DEVSUBTYPE_GUITAR 0x06
+#endif
+#ifndef XINPUT_DEVSUBTYPE_DRUM_KIT
+ #define XINPUT_DEVSUBTYPE_DRUM_KIT 0x08
+#endif
+#ifndef XINPUT_DEVSUBTYPE_ARCADE_PAD
+ #define XINPUT_DEVSUBTYPE_ARCADE_PAD 0x13
+#endif
+
 // winmm.dll function pointer typedefs
 typedef DWORD (WINAPI * TIMEGETTIME_T)(void);
 #define _glfw_timeGetTime _glfw.win32.winmm.timeGetTime

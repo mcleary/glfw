@@ -30,11 +30,6 @@
 #define _GLFW_PLATFORM_LIBRARY_JOYSTICK_STATE \
     _GLFWjoystickWin32 win32_js[GLFW_JOYSTICK_LAST + 1]
 
-// HACK: Define macros that some older xinput.h variants don't
-#ifndef XINPUT_CAPS_WIRELESS
- #define XINPUT_CAPS_WIRELESS 0x0002
-#endif
-
 // Win32-specific per-joystick data
 //
 typedef struct _GLFWjoystickWin32

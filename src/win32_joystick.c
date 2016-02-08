@@ -43,7 +43,7 @@ static const char* getDeviceDescription(const XINPUT_CAPABILITIES* xic)
             return "XInput Wheel";
         case XINPUT_DEVSUBTYPE_ARCADE_STICK:
             return "XInput Arcade Stick";
-        case XINPUT_DEVSUBTYPE_FLIGHT_SICK:
+        case XINPUT_DEVSUBTYPE_FLIGHT_STICK:
             return "XInput Flight Stick";
         case XINPUT_DEVSUBTYPE_DANCE_PAD:
             return "XInput Dance Pad";
@@ -121,7 +121,7 @@ static GLFWbool pollJoystickEvents(_GLFWjoystickWin32* js, int flags)
         {
             free(js->name);
             memset(js, 0, sizeof(_GLFWjoystickWin32));
-            _glfwInputJoystickChange(js - _glfw.win32_js, GLFW_DISCONNECTED);
+            _glfwInputJoystickChange((int) (js - _glfw.win32_js), GLFW_DISCONNECTED);
         }
 
         return GLFW_FALSE;
@@ -129,9 +129,9 @@ static GLFWbool pollJoystickEvents(_GLFWjoystickWin32* js, int flags)
 
     if (flags & _GLFW_UPDATE_AXES)
     {
-        if (sqrtf(xis.Gamepad.sThumbLX * xis.Gamepad.sThumbLX +
-                  xis.Gamepad.sThumbLY * xis.Gamepad.sThumbLY) >
-            XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+        if (sqrtf((float) (xis.Gamepad.sThumbLX * xis.Gamepad.sThumbLX +
+                           xis.Gamepad.sThumbLY * xis.Gamepad.sThumbLY)) >
+            (float) XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
         {
             js->axes[0] = (xis.Gamepad.sThumbLX + 0.5f) / 32767.f;
             js->axes[1] = (xis.Gamepad.sThumbLY + 0.5f) / 32767.f;
@@ -142,9 +142,9 @@ static GLFWbool pollJoystickEvents(_GLFWjoystickWin32* js, int flags)
             js->axes[1] = 0.f;
         }
 
-        if (sqrtf(xis.Gamepad.sThumbRX * xis.Gamepad.sThumbRX +
-                  xis.Gamepad.sThumbRY * xis.Gamepad.sThumbRY) >
-            XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+        if (sqrtf((float) (xis.Gamepad.sThumbRX * xis.Gamepad.sThumbRX +
+                           xis.Gamepad.sThumbRY * xis.Gamepad.sThumbRY)) >
+            (float) XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
         {
             js->axes[2] = (xis.Gamepad.sThumbRX + 0.5f) / 32767.f;
             js->axes[3] = (xis.Gamepad.sThumbRY + 0.5f) / 32767.f;
