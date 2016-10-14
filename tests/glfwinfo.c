@@ -1,6 +1,6 @@
 //========================================================================
 // Context creation and information tool
-// Copyright (c) Camilla Berglund <elmindreda@elmindreda.org>
+// Copyright (c) Camilla Berglund <elmindreda@glfw.org>
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -41,6 +41,9 @@
 #define API_NAME_OPENGL     "gl"
 #define API_NAME_OPENGL_ES  "es"
 
+#define API_NAME_NATIVE     "native"
+#define API_NAME_EGL        "egl"
+
 #define PROFILE_NAME_CORE   "core"
 #define PROFILE_NAME_COMPAT "compat"
 
@@ -60,6 +63,9 @@ static void usage(void)
     printf("  -b, --behavior=BEHAVIOR   the release behavior to use ("
                                         BEHAVIOR_NAME_NONE " or "
                                         BEHAVIOR_NAME_FLUSH ")\n");
+    printf("  -c, --context-api=API     the context creation API to use ("
+                                        API_NAME_NATIVE " or "
+                                        API_NAME_EGL ")\n");
     printf("  -d, --debug               request a debug context\n");
     printf("  -f, --forward             require a forward-compatible context\n");
     printf("  -h, --help                show this help\n");
@@ -165,15 +171,15 @@ static const char* get_strategy_name_glfw(int strategy)
     return "unknown";
 }
 
-static void list_context_extensions(int api, int major, int minor)
+static void list_context_extensions(int client, int major, int minor)
 {
     int i;
     GLint count;
     const GLubyte* extensions;
 
-    printf("%s context extensions:\n", get_api_name(api));
+    printf("%s context extensions:\n", get_api_name(client));
 
-    if (api == GLFW_OPENGL_API && major > 2)
+    if (client == GLFW_OPENGL_API && major > 2)
     {
         glGetIntegerv(GL_NUM_EXTENSIONS, &count);
 
@@ -351,13 +357,13 @@ static void print_version(void)
 
 int main(int argc, char** argv)
 {
-    int ch, api, major, minor, revision, profile;
+    int ch, client, major, minor, revision, profile;
     GLint redbits, greenbits, bluebits, alphabits, depthbits, stencilbits;
     int list_extensions = GLFW_FALSE, list_layers = GLFW_FALSE;
     GLenum error;
     GLFWwindow* window;
 
-    enum { API, BEHAVIOR, DEBUG, FORWARD, HELP, EXTENSIONS, LAYERS,
+    enum { CLIENT, CONTEXT, BEHAVIOR, DEBUG, FORWARD, HELP, EXTENSIONS, LAYERS,
            MAJOR, MINOR, PROFILE, ROBUSTNESS, VERSION,
            REDBITS, GREENBITS, BLUEBITS, ALPHABITS, DEPTHBITS, STENCILBITS,
            ACCUMREDBITS, ACCUMGREENBITS, ACCUMBLUEBITS, ACCUMALPHABITS,
@@ -365,7 +371,8 @@ int main(int argc, char** argv)
     const struct option options[] =
     {
         { "behavior",         1, NULL, BEHAVIOR },
-        { "client-api",       1, NULL, API },
+        { "client-api",       1, NULL, CLIENT },
+        { "context-api",      1, NULL, CONTEXT },
         { "debug",            0, NULL, DEBUG },
         { "forward",          0, NULL, FORWARD },
         { "help",             0, NULL, HELP },
@@ -405,12 +412,12 @@ int main(int argc, char** argv)
     if (!glfwInit())
         exit(EXIT_FAILURE);
 
-    while ((ch = getopt_long(argc, argv, "a:b:dfhlm:n:p:s:v", options, NULL)) != -1)
+    while ((ch = getopt_long(argc, argv, "a:b:c:dfhlm:n:p:s:v", options, NULL)) != -1)
     {
         switch (ch)
         {
             case 'a':
-            case API:
+            case CLIENT:
                 if (strcasecmp(optarg, API_NAME_OPENGL) == 0)
                     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
                 else if (strcasecmp(optarg, API_NAME_OPENGL_ES) == 0)
@@ -433,6 +440,18 @@ int main(int argc, char** argv)
                     glfwWindowHint(GLFW_CONTEXT_RELEASE_BEHAVIOR,
                                    GLFW_RELEASE_BEHAVIOR_FLUSH);
                 }
+                else
+                {
+                    usage();
+                    exit(EXIT_FAILURE);
+                }
+                break;
+            case 'c':
+            case CONTEXT:
+                if (strcasecmp(optarg, API_NAME_NATIVE) == 0)
+                    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
+                else if (strcasecmp(optarg, API_NAME_EGL) == 0)
+                    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
                 else
                 {
                     usage();
@@ -616,30 +635,30 @@ int main(int argc, char** argv)
 
     // Report client API version
 
-    api = glfwGetWindowAttrib(window, GLFW_CLIENT_API);
+    client = glfwGetWindowAttrib(window, GLFW_CLIENT_API);
     major = glfwGetWindowAttrib(window, GLFW_CONTEXT_VERSION_MAJOR);
     minor = glfwGetWindowAttrib(window, GLFW_CONTEXT_VERSION_MINOR);
     revision = glfwGetWindowAttrib(window, GLFW_CONTEXT_REVISION);
     profile = glfwGetWindowAttrib(window, GLFW_OPENGL_PROFILE);
 
     printf("%s context version string: \"%s\"\n",
-           get_api_name(api),
+           get_api_name(client),
            glGetString(GL_VERSION));
 
     printf("%s context version parsed by GLFW: %u.%u.%u\n",
-           get_api_name(api),
+           get_api_name(client),
            major, minor, revision);
 
     // Report client API context properties
 
-    if (api == GLFW_OPENGL_API)
+    if (client == GLFW_OPENGL_API)
     {
         if (major >= 3)
         {
             GLint flags;
 
             glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
-            printf("%s context flags (0x%08x):", get_api_name(api), flags);
+            printf("%s context flags (0x%08x):", get_api_name(client), flags);
 
             if (flags & GL_CONTEXT_FLAG_FORWARD_COMPATIBLE_BIT)
                 printf(" forward-compatible");
@@ -651,7 +670,7 @@ int main(int argc, char** argv)
                 printf(" no-error");
             putchar('\n');
 
-            printf("%s context flags parsed by GLFW:", get_api_name(api));
+            printf("%s context flags parsed by GLFW:", get_api_name(client));
 
             if (glfwGetWindowAttrib(window, GLFW_OPENGL_FORWARD_COMPAT))
                 printf(" forward-compatible");
@@ -670,49 +689,49 @@ int main(int argc, char** argv)
             glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &mask);
 
             printf("%s profile mask (0x%08x): %s\n",
-                   get_api_name(api),
+                   get_api_name(client),
                    mask,
                    get_profile_name_gl(mask));
 
             printf("%s profile mask parsed by GLFW: %s\n",
-                   get_api_name(api),
+                   get_api_name(client),
                    get_profile_name_glfw(profile));
         }
 
-        if (glfwExtensionSupported("GL_ARB_robustness"))
+        if (GLAD_GL_ARB_robustness)
         {
             const int robustness = glfwGetWindowAttrib(window, GLFW_CONTEXT_ROBUSTNESS);
             GLint strategy;
             glGetIntegerv(GL_RESET_NOTIFICATION_STRATEGY_ARB, &strategy);
 
             printf("%s robustness strategy (0x%08x): %s\n",
-                   get_api_name(api),
+                   get_api_name(client),
                    strategy,
                    get_strategy_name_gl(strategy));
 
             printf("%s robustness strategy parsed by GLFW: %s\n",
-                   get_api_name(api),
+                   get_api_name(client),
                    get_strategy_name_glfw(robustness));
         }
     }
 
     printf("%s context renderer string: \"%s\"\n",
-           get_api_name(api),
+           get_api_name(client),
            glGetString(GL_RENDERER));
     printf("%s context vendor string: \"%s\"\n",
-           get_api_name(api),
+           get_api_name(client),
            glGetString(GL_VENDOR));
 
     if (major >= 2)
     {
         printf("%s context shading language version: \"%s\"\n",
-               get_api_name(api),
+               get_api_name(client),
                glGetString(GL_SHADING_LANGUAGE_VERSION));
     }
 
-    printf("%s framebuffer:\n", get_api_name(api));
+    printf("%s framebuffer:\n", get_api_name(client));
 
-    if (api == GLFW_OPENGL_API && profile == GLFW_OPENGL_CORE_PROFILE)
+    if (client == GLFW_OPENGL_API && profile == GLFW_OPENGL_CORE_PROFILE)
     {
         glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER,
                                               GL_BACK_LEFT,
@@ -752,8 +771,8 @@ int main(int argc, char** argv)
     printf(" red: %u green: %u blue: %u alpha: %u depth: %u stencil: %u\n",
            redbits, greenbits, bluebits, alphabits, depthbits, stencilbits);
 
-    if (api == GLFW_OPENGL_ES_API ||
-        glfwExtensionSupported("GL_ARB_multisample") ||
+    if (client == GLFW_OPENGL_ES_API ||
+        GLAD_GL_ARB_multisample ||
         major > 1 || minor >= 3)
     {
         GLint samples, samplebuffers;
@@ -763,7 +782,7 @@ int main(int argc, char** argv)
         printf(" samples: %u sample buffers: %u\n", samples, samplebuffers);
     }
 
-    if (api == GLFW_OPENGL_API && profile != GLFW_OPENGL_CORE_PROFILE)
+    if (client == GLFW_OPENGL_API && profile != GLFW_OPENGL_CORE_PROFILE)
     {
         GLint accumredbits, accumgreenbits, accumbluebits, accumalphabits;
         GLint auxbuffers;
@@ -779,7 +798,7 @@ int main(int argc, char** argv)
     }
 
     if (list_extensions)
-        list_context_extensions(api, major, minor);
+        list_context_extensions(client, major, minor);
 
     printf("Vulkan loader: %s\n",
            glfwVulkanSupported() ? "available" : "missing");
@@ -816,7 +835,7 @@ int main(int argc, char** argv)
         ai.applicationVersion = GLFW_VERSION_MAJOR;
         ai.pEngineName = "GLFW";
         ai.engineVersion = GLFW_VERSION_MAJOR;
-        ai.apiVersion = VK_API_VERSION;
+        ai.apiVersion = VK_API_VERSION_1_0;
 
         ici.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         ici.pApplicationInfo = &ai;

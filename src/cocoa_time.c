@@ -1,7 +1,7 @@
 //========================================================================
-// GLFW 3.2 OS X - www.glfw.org
+// GLFW 3.3 OS X - www.glfw.org
 //------------------------------------------------------------------------
-// Copyright (c) 2009-2010 Camilla Berglund <elmindreda@elmindreda.org>
+// Copyright (c) 2009-2016 Camilla Berglund <elmindreda@glfw.org>
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -48,12 +48,12 @@ void _glfwInitTimerNS(void)
 //////                       GLFW platform API                      //////
 //////////////////////////////////////////////////////////////////////////
 
-GLFWuint64 _glfwPlatformGetTimerValue(void)
+uint64_t _glfwPlatformGetTimerValue(void)
 {
     return mach_absolute_time();
 }
 
-GLFWuint64 _glfwPlatformGetTimerFrequency(void)
+uint64_t _glfwPlatformGetTimerFrequency(void)
 {
     return _glfw.ns_time.frequency;
 }

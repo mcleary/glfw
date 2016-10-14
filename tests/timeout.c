@@ -1,6 +1,6 @@
 //========================================================================
 // Event wait timeout test
-// Copyright (c) Camilla Berglund <elmindreda@elmindreda.org>
+// Copyright (c) Camilla Berglund <elmindreda@glfw.org>
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -53,7 +53,6 @@ static float nrand(void)
 
 int main(void)
 {
-    int result;
     GLFWwindow* window;
 
     srand((unsigned int) time(NULL));

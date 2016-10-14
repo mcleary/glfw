@@ -1,6 +1,6 @@
 //========================================================================
 // Iconify/restore test program
-// Copyright (c) Camilla Berglund <elmindreda@elmindreda.org>
+// Copyright (c) Camilla Berglund <elmindreda@glfw.org>
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -76,6 +76,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window, GLFW_TRUE);
             break;
+        case GLFW_KEY_F11:
         case GLFW_KEY_ENTER:
         {
             if (mods != GLFW_MOD_ALT)
@@ -130,7 +131,14 @@ static void window_iconify_callback(GLFWwindow* window, int iconified)
 {
     printf("%0.2f Window %s\n",
            glfwGetTime(),
-           iconified ? "iconified" : "restored");
+           iconified ? "iconified" : "uniconified");
+}
+
+static void window_maximize_callback(GLFWwindow* window, int maximized)
+{
+    printf("%0.2f Window %s\n",
+           glfwGetTime(),
+           maximized ? "maximized" : "unmaximized");
 }
 
 static void window_refresh_callback(GLFWwindow* window)
@@ -265,6 +273,7 @@ int main(int argc, char** argv)
         glfwSetWindowSizeCallback(windows[i], window_size_callback);
         glfwSetWindowFocusCallback(windows[i], window_focus_callback);
         glfwSetWindowIconifyCallback(windows[i], window_iconify_callback);
+        glfwSetWindowMaximizeCallback(windows[i], window_maximize_callback);
         glfwSetWindowRefreshCallback(windows[i], window_refresh_callback);
 
         window_refresh_callback(windows[i]);

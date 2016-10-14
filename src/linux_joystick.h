@@ -1,5 +1,5 @@
 //========================================================================
-// GLFW 3.2 Linux - www.glfw.org
+// GLFW 3.3 Linux - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2014 Jonas Ådahl <jadahl@gmail.com>
 //
@@ -46,7 +46,6 @@ typedef struct _GLFWjoystickLinux
     char*           path;
 } _GLFWjoystickLinux;
 
-
 // Linux-specific joystick API data
 //
 typedef struct _GLFWjoylistLinux
@@ -63,5 +62,7 @@ typedef struct _GLFWjoylistLinux
 
 GLFWbool _glfwInitJoysticksLinux(void);
 void _glfwTerminateJoysticksLinux(void);
+
+void _glfwPollJoystickEvents(void);
 
 #endif // _glfw3_linux_joystick_h_
